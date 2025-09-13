@@ -1,0 +1,114 @@
+[
+  {
+    "Id": 1,
+    "name": "Required Title Section",
+    "category": "Structure",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Document must contain a clear title"
+  },
+  {
+    "Id": 2,
+    "name": "Document ID Format",
+    "category": "Metadata",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Document ID must follow SOP-### format"
+  },
+  {
+    "Id": 3,
+    "name": "Version Information",
+    "category": "Metadata",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Document must contain version/revision information"
+  },
+  {
+    "Id": 4,
+    "name": "Effective Date",
+    "category": "Metadata",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Effective date must be in YYYY-MM-DD format"
+  },
+  {
+    "Id": 5,
+    "name": "Purpose Section",
+    "category": "Structure",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Document must contain a purpose section"
+  },
+  {
+    "Id": 6,
+    "name": "Scope Section",
+    "category": "Structure",
+    "severity": "Major",
+    "enabled": true,
+    "validation": "Document must contain a scope section"
+  },
+  {
+    "Id": 7,
+    "name": "Responsibilities Section",
+    "category": "Structure",
+    "severity": "Major",
+    "enabled": true,
+    "validation": "Document must define responsibilities"
+  },
+  {
+    "Id": 8,
+    "name": "Definitions Section",
+    "category": "Structure",
+    "severity": "Minor",
+    "enabled": true,
+    "validation": "Document should contain definitions for technical terms"
+  },
+  {
+    "Id": 9,
+    "name": "Procedure Section",
+    "category": "Content",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Procedure section must contain at least 3 numbered steps"
+  },
+  {
+    "Id": 10,
+    "name": "References Section",
+    "category": "Content",
+    "severity": "Major",
+    "enabled": true,
+    "validation": "References must include publication years"
+  },
+  {
+    "Id": 11,
+    "name": "Revision History",
+    "category": "Metadata",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Must contain at least one revision history entry"
+  },
+  {
+    "Id": 12,
+    "name": "Approval Signatures",
+    "category": "Content",
+    "severity": "Critical",
+    "enabled": true,
+    "validation": "Must contain Prepared by, Reviewed by, and Approved by signatures"
+  },
+  {
+    "Id": 13,
+    "name": "No Placeholder Text",
+    "category": "Content",
+    "severity": "Major",
+    "enabled": true,
+    "validation": "Document must not contain TBD, lorem ipsum, or similar placeholders"
+  },
+  {
+    "Id": 14,
+    "name": "Proper Reference Format",
+    "category": "Content",
+    "severity": "Minor",
+    "enabled": true,
+    "validation": "References should follow standard citation format with years"
+  }
+]
