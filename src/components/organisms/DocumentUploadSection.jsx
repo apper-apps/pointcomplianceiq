@@ -3,7 +3,6 @@ import FileUpload from "@/components/molecules/FileUpload";
 import DocumentPreview from "@/components/molecules/DocumentPreview";
 import documentService from "@/services/api/documentService";
 import { toast } from "react-toastify";
-
 const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumentDelete }) => {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -27,9 +26,10 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
       });
 
       onDocumentProcessed(result.document, result.validationResult);
-    } catch (error) {
+} catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to process document. Please try again.", {
+      const errorMessage = error.message || "Failed to process document. Please try again.";
+      toast.error(errorMessage, {
         position: "top-right",
         autoClose: 4000
       });
@@ -55,16 +55,23 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
         }
         
         resolve(content);
-      };
+};
       
-      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.onerror = (error) => {
+        console.error("File reading error:", error);
+        reject(new Error(`Failed to read file: ${file.name}`));
+      };
       
       if (file.type === "text/plain") {
         reader.readAsText(file);
       } else {
         // For PDF and Word files, simulate content extraction
         setTimeout(() => {
-          resolve(generateSampleContent(file.name, file.type.includes("pdf") ? "pdf" : "docx"));
+          try {
+            resolve(generateSampleContent(file.name, file.type.includes("pdf") ? "pdf" : "docx"));
+          } catch (error) {
+            reject(new Error(`Failed to process ${file.type} file: ${file.name}`));
+          }
         }, 1000);
       }
     });

@@ -38,39 +38,56 @@ class DocumentService {
       complianceScore: 0
     };
 
-    this.documents.unshift(newDocument);
+this.documents.unshift(newDocument);
     
-    // Simulate validation processing
-    const validationResult = await this.validateDocument(newDocument);
-    
-    // Update document with results
-    const updatedDocument = {
-      ...newDocument,
-      status: "completed",
-      complianceScore: validationResult.score
-    };
-    
-    this.documents[0] = updatedDocument;
-    
-    return {
-      document: updatedDocument,
-      validationResult
-    };
+    try {
+      // Simulate validation processing
+      const validationResult = await this.validateDocument(newDocument);
+      
+      // Update document with results
+      const updatedDocument = {
+        ...newDocument,
+        status: "completed",
+        complianceScore: validationResult.score
+      };
+      
+      this.documents[0] = updatedDocument;
+      
+      return {
+        document: updatedDocument,
+        validationResult
+      };
+    } catch (error) {
+      // Update document with error status
+      const failedDocument = {
+        ...newDocument,
+        status: "failed",
+        complianceScore: 0
+      };
+      
+      this.documents[0] = failedDocument;
+      throw new Error(`Document validation failed: ${error.message}`);
+    }
   }
 
-  async validateDocument(document) {
+async validateDocument(document) {
     await delay(500);
     
-    const issues = this.performValidation(document.content);
-    const score = this.calculateComplianceScore(issues);
-    
-    return {
-      documentId: document.Id.toString(),
-      score,
-      issues,
-      timestamp: new Date().toISOString(),
-      processTime: 2.3
-    };
+    try {
+      const issues = this.performValidation(document.content);
+      const score = this.calculateComplianceScore(issues);
+      
+      return {
+        documentId: document.Id.toString(),
+        score,
+        issues,
+        timestamp: new Date().toISOString(),
+        processTime: 2.3
+      };
+    } catch (error) {
+      console.error("Validation processing error:", error);
+      throw new Error(`Failed to validate document content: ${error.message}`);
+    }
   }
 
   performValidation(content) {

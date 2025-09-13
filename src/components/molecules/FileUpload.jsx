@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
+import { toast } from "react-hot-toast";
+import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
-import { cn } from "@/utils/cn";
-
 const FileUpload = ({ onFileUpload, isUploading = false, className }) => {
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
@@ -36,15 +36,13 @@ const FileUpload = ({ onFileUpload, isUploading = false, className }) => {
       "application/msword",
       "text/plain"
     ];
-
-    if (!allowedTypes.includes(file.type)) {
-      alert("Please upload a PDF, Word document, or text file.");
+if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a PDF, Word document, or text file.");
       return;
     }
 
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      alert("File size must be less than 10MB.");
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+      toast.error("File size must be less than 10MB.");
       return;
     }
 
