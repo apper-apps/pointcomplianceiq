@@ -184,7 +184,7 @@ content += `Document ID: SOP-${Math.floor(Math.random() * 999).toString().padSta
   };
 
   return (
-    <div className="space-y-6">
+<div className="space-y-6" data-upload-section="true">
       {!currentDocument ? (
         <FileUpload 
           onFileUpload={handleFileUpload}

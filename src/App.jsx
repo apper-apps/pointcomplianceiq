@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import ComplianceDashboard from "@/components/pages/ComplianceDashboard";
-import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (

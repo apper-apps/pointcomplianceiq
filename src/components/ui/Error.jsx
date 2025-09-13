@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
 
@@ -10,7 +10,6 @@ const Error = ({
   details = null
 }) => {
   const [showFullDetails, setShowFullDetails] = useState(false);
-
   return (
     <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
       <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">

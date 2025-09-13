@@ -73,9 +73,18 @@ const ComplianceDashboard = () => {
               title="Start Document Validation"
               message="Upload your regulatory document to begin AI-powered compliance validation. Our system will check for GxP requirements, missing sections, and compliance gaps."
               actionText="Upload Your First Document"
-              onAction={() => {
-                // Scroll to upload section or trigger file dialog
-                document.querySelector('input[type="file"]')?.click();
+onAction={() => {
+                // Trigger file dialog through DocumentUploadSection
+                const fileInput = document.querySelector('input[type="file"]');
+                if (fileInput) {
+                  fileInput.click();
+                } else {
+                  // Scroll to upload section if file input not found
+                  const uploadSection = document.querySelector('[data-upload-section="true"]');
+                  if (uploadSection) {
+                    uploadSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }
               }}
               icon="FileCheck"
             />
