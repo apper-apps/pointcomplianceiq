@@ -6,8 +6,8 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 class DocumentService {
   constructor() {
-    this.documents = [...documentsData];
-    this.complianceRules = [...complianceRulesData];
+this.documents = documentsData.map(doc => ({ ...doc }));
+    this.complianceRules = complianceRulesData.map(rule => ({ ...rule }));
   }
 
   async getAllDocuments() {
@@ -15,9 +15,13 @@ class DocumentService {
     return [...this.documents];
   }
 
-  async getDocumentById(id) {
+async getDocumentById(id) {
     await delay(200);
-    const document = this.documents.find(doc => doc.Id === parseInt(id));
+    const numericId = parseInt(id);
+    if (isNaN(numericId)) {
+      throw new Error('Invalid document ID format');
+    }
+    const document = this.documents.find(doc => doc.Id === numericId);
     if (!document) {
       throw new Error(`Document with Id ${id} not found`);
     }
@@ -27,7 +31,7 @@ class DocumentService {
   async uploadDocument(file, content) {
     await delay(1500); // Simulate processing time
     
-    const newId = Math.max(...this.documents.map(d => d.Id), 0) + 1;
+const newId = this.documents.length > 0 ? Math.max(...this.documents.map(d => d.Id)) + 1 : 1;
     const newDocument = {
       Id: newId,
       fileName: file.name,
@@ -215,10 +219,14 @@ async validateDocument(document) {
   }
 
   async deleteDocument(id) {
-    await delay(300);
-    const index = this.documents.findIndex(doc => doc.Id === parseInt(id));
+await delay(300);
+    const numericId = parseInt(id);
+    if (isNaN(numericId)) {
+      throw new Error('Invalid document ID format');
+    }
+    const index = this.documents.findIndex(doc => doc.Id === numericId);
     if (index === -1) {
-      throw new Error(`Document with Id ${id} not found`);
+      throw new Error(`Document with Id ${numericId} not found`);
     }
     
     const deletedDocument = this.documents.splice(index, 1)[0];

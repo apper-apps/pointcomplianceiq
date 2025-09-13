@@ -28,13 +28,13 @@ const Button = forwardRef(({
   };
   
   return (
-    <button
+<button
       ref={ref}
       className={cn(
         baseStyles,
         variants[variant],
         sizes[size],
-        disabled && "transform-none hover:scale-100",
+        disabled && "opacity-50 cursor-not-allowed transform-none hover:scale-100",
         className
       )}
       disabled={disabled}

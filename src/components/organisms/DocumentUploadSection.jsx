@@ -47,8 +47,8 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
         
         // For demo purposes, simulate content extraction from different file types
         if (file.type === "application/pdf") {
-          // Simulate PDF text extraction
-          content = generateSampleContent(file.name, "pdf");
+// Simulate PDF text extraction with more realistic content
+          content = generateSampleContent(file.name, "pdf", file.size);
         } else if (file.type.includes("word")) {
           // Simulate Word document content extraction
           content = generateSampleContent(file.name, "docx");
