@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
