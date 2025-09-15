@@ -1,84 +1,185 @@
-import documentsData from "@/services/mockData/documents.json";
-import complianceRulesData from "@/services/mockData/complianceRules.json";
-
-// Simulate API delay
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+import { toast } from "react-toastify";
 
 class DocumentService {
   constructor() {
-this.documents = documentsData.map(doc => ({ ...doc }));
-    this.complianceRules = complianceRulesData.map(rule => ({ ...rule }));
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'document_c';
   }
 
   async getAllDocuments() {
-    await delay(300);
-    return [...this.documents];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "file_name_c" } },
+          { field: { Name: "upload_date_c" } },
+          { field: { Name: "content_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "compliance_score_c" } },
+          { field: { Name: "size_c" } }
+        ],
+        orderBy: [
+          {
+            fieldName: "upload_date_c",
+            sorttype: "DESC"
+          }
+        ],
+        pagingInfo: {
+          limit: 50,
+          offset: 0
+        }
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching documents:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      return [];
+    }
   }
 
-async getDocumentById(id) {
-    await delay(200);
-    const numericId = parseInt(id);
-    if (isNaN(numericId)) {
-      throw new Error('Invalid document ID format');
+  async getDocumentById(id) {
+    try {
+      const numericId = parseInt(id);
+      if (isNaN(numericId)) {
+        throw new Error('Invalid document ID format');
+      }
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "file_name_c" } },
+          { field: { Name: "upload_date_c" } },
+          { field: { Name: "content_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "compliance_score_c" } },
+          { field: { Name: "size_c" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, numericId, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching document with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      throw error;
     }
-    const document = this.documents.find(doc => doc.Id === numericId);
-    if (!document) {
-      throw new Error(`Document with Id ${id} not found`);
-    }
-    return { ...document };
   }
 
   async uploadDocument(file, content) {
-    await delay(1500); // Simulate processing time
-    
-const newId = this.documents.length > 0 ? Math.max(...this.documents.map(d => d.Id)) + 1 : 1;
-    const newDocument = {
-      Id: newId,
-      fileName: file.name,
-      uploadDate: new Date().toISOString(),
-      content: content,
-      type: file.type.includes("pdf") ? "pdf" : file.type.includes("word") ? "docx" : "txt",
-      status: "processing",
-      complianceScore: 0
-    };
-
-this.documents.unshift(newDocument);
-    
     try {
-      // Simulate validation processing
-      const validationResult = await this.validateDocument(newDocument);
-      
-      // Update document with results
-      const updatedDocument = {
-        ...newDocument,
-        status: "completed",
-        complianceScore: validationResult.score
+      // First create the document record
+      const newDocument = {
+        Name: file.name,
+        file_name_c: file.name,
+        upload_date_c: new Date().toISOString(),
+        content_c: content,
+        type_c: file.type.includes("pdf") ? "pdf" : file.type.includes("word") ? "docx" : "txt",
+        status_c: "processing",
+        compliance_score_c: 0,
+        size_c: file.size ? file.size.toString() : "0"
       };
-      
-      this.documents[0] = updatedDocument;
-      
-      return {
-        document: updatedDocument,
-        validationResult
+
+      const params = {
+        records: [newDocument]
       };
+
+      const response = await this.apperClient.createRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create document ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+
+        if (successfulRecords.length > 0) {
+          const createdDocument = successfulRecords[0].data;
+          
+          // Simulate validation processing
+          const validationResult = await this.validateDocument(createdDocument);
+          
+          // Update document with results
+          const updateParams = {
+            records: [{
+              Id: createdDocument.Id,
+              status_c: "completed",
+              compliance_score_c: validationResult.score
+            }]
+          };
+
+          await this.apperClient.updateRecord(this.tableName, updateParams);
+          
+          // Return updated document data
+          const updatedDocument = {
+            ...createdDocument,
+            status_c: "completed",
+            compliance_score_c: validationResult.score
+          };
+          
+          return {
+            document: updatedDocument,
+            validationResult
+          };
+        }
+      }
+
+      throw new Error("No records were created successfully");
+
     } catch (error) {
-      // Update document with error status
-      const failedDocument = {
-        ...newDocument,
-        status: "failed",
-        complianceScore: 0
-      };
-      
-      this.documents[0] = failedDocument;
-      throw new Error(`Document validation failed: ${error.message}`);
+      if (error?.response?.data?.message) {
+        console.error("Error creating document:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      throw error;
     }
   }
 
-async validateDocument(document) {
-    await delay(500);
-    
+  async validateDocument(document) {
     try {
-      const issues = this.performValidation(document.content);
+      const issues = this.performValidation(document.content_c);
       const score = this.calculateComplianceScore(issues);
       
       return {
@@ -100,7 +201,7 @@ async validateDocument(document) {
 
     // Check for required sections
     const requiredSections = [
-{ name: "title", pattern: /title:/i, rule: "Required Title Section" },
+      { name: "title", pattern: /title:/i, rule: "Required Title Section" },
       { name: "document id", pattern: /document id:/i, rule: "Document ID Format" },
       { name: "version", pattern: /(version|revision):/i, rule: "Version Information" },
       { name: "effective date", pattern: /effective date:/i, rule: "Effective Date" },
@@ -116,11 +217,10 @@ async validateDocument(document) {
 
     requiredSections.forEach(section => {
       if (!section.pattern.test(content)) {
-        const rule = this.complianceRules.find(r => r.name === section.rule);
         issues.push({
           id: `missing-${section.name}`,
-          category: rule?.category || "Structure",
-          severity: rule?.severity || "Critical",
+          category: "Structure",
+          severity: "Critical",
           description: `Missing required section: ${section.name}`,
           location: "Document structure",
           rule: section.rule
@@ -129,7 +229,7 @@ async validateDocument(document) {
     });
 
     // Check document ID format
-if (!/SOP-\d{3}/i.test(content)) {
+    if (!/SOP-\d{3}/i.test(content)) {
       issues.push({
         id: "invalid-doc-id",
         category: "Metadata",
@@ -153,7 +253,7 @@ if (!/SOP-\d{3}/i.test(content)) {
     }
 
     // Check for effective date format
-if (!/effective date:\s*\d{4}-\d{2}-\d{2}/i.test(content)) {
+    if (!/effective date:\s*\d{4}-\d{2}-\d{2}/i.test(content)) {
       issues.push({
         id: "missing-effective-date",
         category: "Metadata",
@@ -178,7 +278,7 @@ if (!/effective date:\s*\d{4}-\d{2}-\d{2}/i.test(content)) {
     }
 
     // Check for placeholder text
-const placeholders = ["tbd", "lorem ipsum", "placeholder", "[empty]", "to be determined", "insert text here"];
+    const placeholders = ["tbd", "lorem ipsum", "placeholder", "[empty]", "to be determined", "insert text here"];
     placeholders.forEach(placeholder => {
       if (contentLower.includes(placeholder.toLowerCase())) {
         issues.push({
@@ -212,7 +312,7 @@ const placeholders = ["tbd", "lorem ipsum", "placeholder", "[empty]", "to be det
     });
 
     // Check procedure steps
-const procedureSteps = (content.match(/\d+\.\s+[A-Z]/g) || []).length;
+    const procedureSteps = (content.match(/\d+\.\s+[A-Z]/g) || []).length;
     if (procedureSteps < 3) {
       issues.push({
         id: "insufficient-steps",
@@ -242,7 +342,7 @@ const procedureSteps = (content.match(/\d+\.\s+[A-Z]/g) || []).length;
     }
 
     // Check references with years
-const references = content.match(/references:([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
+    const references = content.match(/references:([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
     if (references) {
       const referenceText = references[1];
       const hasYears = /\d{4}/.test(referenceText);
@@ -274,7 +374,7 @@ const references = content.match(/references:([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
       }
     }
 
-return issues;
+    return issues;
   }
 
   calculateComplianceScore(issues) {
@@ -293,25 +393,52 @@ return issues;
     return Math.round(score);
   }
 
-  async getComplianceRules() {
-    await delay(200);
-    return [...this.complianceRules];
-  }
-
   async deleteDocument(id) {
-await delay(300);
-    const numericId = parseInt(id);
-    if (isNaN(numericId)) {
-      throw new Error('Invalid document ID format');
+    try {
+      const numericId = parseInt(id);
+      if (isNaN(numericId)) {
+        throw new Error('Invalid document ID format');
+      }
+
+      const params = {
+        RecordIds: [numericId]
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete document ${failedDeletions.length} records:${failedDeletions}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulDeletions.length > 0;
+      }
+
+      return false;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting document:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      throw error;
     }
-    const index = this.documents.findIndex(doc => doc.Id === numericId);
-    if (index === -1) {
-      throw new Error(`Document with Id ${numericId} not found`);
-    }
-    
-    const deletedDocument = this.documents.splice(index, 1)[0];
-    return deletedDocument;
   }
 }
 
+// Export singleton instance
+const documentService = new DocumentService();
+export default documentService;
 export default new DocumentService();

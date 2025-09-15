@@ -1,9 +1,9 @@
-import { useState } from "react";
-import ApperIcon from "@/components/ApperIcon";
-import Badge from "@/components/atoms/Badge";
-import Button from "@/components/atoms/Button";
-import { Card, CardHeader, CardContent } from "@/components/atoms/Card";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { format } from "date-fns";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Badge from "@/components/atoms/Badge";
 
 const DocumentPreview = ({ document, onDelete, className }) => {
   const [showFullContent, setShowFullContent] = useState(false);
@@ -68,114 +68,82 @@ const DocumentPreview = ({ document, onDelete, className }) => {
 
   return (
     <Card className={className}>
-      <CardHeader>
+    <CardHeader>
         <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
-              <ApperIcon name={getFileIcon(document.type)} className="w-6 h-6 text-primary-600" />
+            <div className="flex items-start space-x-3">
+                <div
+                    className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
+                    <ApperIcon name={getFileIcon(document.type)} className="w-6 h-6 text-primary-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 truncate">
+                        {document.file_name_c || document.Name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                        {getFileTypeLabel(document.type_c)}• Uploaded {format(new Date(document.upload_date_c), "MMM d, yyyy 'at' h:mm a")}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                        <Badge variant={getStatusColor(document.status_c)}>
+                            <ApperIcon name={getStatusIcon(document.status_c)} className="w-3 h-3 mr-1" />
+                            {document.status_c.charAt(0).toUpperCase() + document.status_c.slice(1)}
+                        </Badge>
+                        {document.status_c === "completed" && <Badge variant="primary">Score: {document.compliance_score_c}%
+                                              </Badge>}
+                    </div>
+                </div>
             </div>
-            
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 truncate">
-                {document.fileName}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                {getFileTypeLabel(document.type)} • Uploaded {format(new Date(document.uploadDate), "MMM d, yyyy 'at' h:mm a")}
-              </p>
-              
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant={getStatusColor(document.status)}>
-                  <ApperIcon name={getStatusIcon(document.status)} className="w-3 h-3 mr-1" />
-                  {document.status.charAt(0).toUpperCase() + document.status.slice(1)}
-                </Badge>
-                
-                {document.status === "completed" && (
-                  <Badge variant="primary">
-                    Score: {document.complianceScore}%
-                  </Badge>
-                )}
-              </div>
+            <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(true)}>
+                    <ApperIcon name="Trash2" className="w-4 h-4" />
+                </Button>
             </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowDeleteConfirm(true)}
-            >
-              <ApperIcon name="Trash2" className="w-4 h-4" />
-            </Button>
-          </div>
         </div>
-      </CardHeader>
-
-      <CardContent>
-        {document.content && (
-          <div className="space-y-4">
+    </CardHeader>
+    <CardContent>
+        {document.content && <div className="space-y-4">
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Document Content</h4>
-              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Document Content</h4>
                 <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
-                  {showFullContent ? document.content : truncatedContent}
+                    {showFullContent ? document.content_c : truncatedContent}
                 </pre>
-                
-                {document.content.length > 500 && (
-                  <Button
+                {document.content_c && document.content_c.length > 500 && <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowFullContent(!showFullContent)}
-                    className="mt-2"
-                  >
+                    className="mt-2">
                     {showFullContent ? "Show Less" : "Show More"}
-                    <ApperIcon 
-                      name={showFullContent ? "ChevronUp" : "ChevronDown"} 
-                      className="w-4 h-4 ml-1" 
-                    />
-                  </Button>
-                )}
-              </div>
+                    <ApperIcon
+                        name={showFullContent ? "ChevronUp" : "ChevronDown"}
+                        className="w-4 h-4 ml-1" />
+                </Button>}
             </div>
-          </div>
-        )}
-
+        </div>}
         {/* Delete Confirmation */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        {showDeleteConfirm && <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 max-w-md w-full">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <ApperIcon name="Trash2" className="w-5 h-5 text-red-600" />
+                <div className="flex items-center space-x-3 mb-4">
+                    <div
+                        className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                        <ApperIcon name="Trash2" className="w-5 h-5 text-red-600" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Delete Document</h3>
+                        <p className="text-gray-600 text-sm">This action cannot be undone.</p>
+                    </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Delete Document</h3>
-                  <p className="text-gray-600 text-sm">This action cannot be undone.</p>
+                <p className="text-gray-700 mb-6">Are you sure you want to delete "{document.file_name_c || document.Name}"? This will permanently remove the document and its validation results.
+                                  </p>
+                <div className="flex justify-end space-x-3">
+                    <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Cancel
+                                        </Button>
+                    <Button variant="danger" onClick={handleDelete}>Delete Document
+                                        </Button>
                 </div>
-              </div>
-              
-              <p className="text-gray-700 mb-6">
-                Are you sure you want to delete "{document.fileName}"? This will permanently remove the document and its validation results.
-              </p>
-              
-              <div className="flex justify-end space-x-3">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={handleDelete}
-                >
-                  Delete Document
-                </Button>
-              </div>
             </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>}
+    </CardContent>
+</Card>
   );
 };
 

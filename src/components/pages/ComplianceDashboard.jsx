@@ -1,11 +1,14 @@
-import { useState } from "react";
+import React, { useContext, useState } from "react";
+import { useSelector } from "react-redux";
+import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
+import { AuthContext } from "../../App";
 import ApperIcon from "@/components/ApperIcon";
-import DocumentUploadSection from "@/components/organisms/DocumentUploadSection";
 import ValidationResults from "@/components/organisms/ValidationResults";
+import DocumentUploadSection from "@/components/organisms/DocumentUploadSection";
+import Button from "@/components/atoms/Button";
 import Empty from "@/components/ui/Empty";
-import { Card, CardHeader, CardContent } from "@/components/atoms/Card";
 
-const ComplianceDashboard = () => {
+const ComplianceDashboard = ({ authMethods }) => {
   const [currentDocument, setCurrentDocument] = useState(null);
   const [validationResult, setValidationResult] = useState(null);
   const [showingResults, setShowingResults] = useState(false);
@@ -44,7 +47,7 @@ const ComplianceDashboard = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+<div className="flex items-center space-x-4">
               {currentDocument && (
                 <button
                   onClick={handleNewUpload}
@@ -55,10 +58,16 @@ const ComplianceDashboard = () => {
                 </button>
               )}
               
-              <div className="text-right">
-                <div className="text-sm font-medium text-gray-900">Regulatory Compliance</div>
-                <div className="text-xs text-gray-600">GxP Validation System</div>
-              </div>
+              <UserInfo />
+              
+              <Button
+                variant="outline"
+                onClick={() => authMethods.logout()}
+                size="sm"
+              >
+                <ApperIcon name="LogOut" className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>
@@ -247,4 +256,33 @@ onAction={() => {
   );
 };
 
-export default ComplianceDashboard;
+// User Info Component
+const UserInfo = () => {
+  const { user } = useSelector((state) => state.user);
+  
+  if (!user) return (
+    <div className="text-right">
+      <div className="text-sm font-medium text-gray-900">Regulatory Compliance</div>
+      <div className="text-xs text-gray-600">GxP Validation System</div>
+    </div>
+  );
+
+  return (
+    <div className="text-right">
+      <div className="text-sm font-medium text-gray-900">
+        {user.firstName} {user.lastName}
+      </div>
+      <div className="text-xs text-gray-600">
+        {user.accounts?.[0]?.companyName || 'ComplianceIQ User'}
+      </div>
+    </div>
+  );
+};
+
+// Add AuthContext usage
+const ComplianceDashboardWithAuth = () => {
+  const authMethods = useContext(AuthContext);
+  return <ComplianceDashboard authMethods={authMethods} />;
+};
+
+export default ComplianceDashboardWithAuth;

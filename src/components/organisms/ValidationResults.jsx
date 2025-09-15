@@ -13,11 +13,11 @@ const ValidationResults = ({ validationResult, document, className }) => {
 
   const handleExportReport = (format) => {
     const reportData = {
-      document: {
-name: document.fileName,
-        uploadDate: document.uploadDate,
-        type: document.type,
-        size: document.size || 'Unknown'
+document: {
+        name: document.file_name_c || document.Name,
+        uploadDate: document.upload_date_c,
+        type: document.type_c,
+        size: document.size_c || 'Unknown'
       },
       validation: {
         score: validationResult.score,

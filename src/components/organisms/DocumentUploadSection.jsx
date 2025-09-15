@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import documentService from "@/services/api/documentService";
 import FileUpload from "@/components/molecules/FileUpload";
 import DocumentPreview from "@/components/molecules/DocumentPreview";
-import documentService from "@/services/api/documentService";
-import { toast } from "react-toastify";
+import Error from "@/components/ui/Error";
 const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumentDelete }) => {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -40,6 +41,11 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
 
   const readFileContent = (file) => {
     return new Promise((resolve, reject) => {
+      if (!file) {
+        reject(new Error("No file provided"));
+        return;
+      }
+
       const reader = new FileReader();
       
       reader.onload = (e) => {
@@ -47,15 +53,18 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
         
         // For demo purposes, simulate content extraction from different file types
         if (file.type === "application/pdf") {
-// Simulate PDF text extraction with more realistic content
+          // Simulate PDF text extraction with more realistic content
           content = generateSampleContent(file.name, "pdf", file.size);
         } else if (file.type.includes("word")) {
-          // Simulate Word document content extraction
-          content = generateSampleContent(file.name, "docx");
+          content = generateSampleContent(file.name, "docx", file.size);
+        } else if (file.type === "text/plain") {
+          // Keep original text content
+        } else {
+          content = generateSampleContent(file.name, "txt", file.size);
         }
         
         resolve(content);
-};
+      };
       
       reader.onerror = (error) => {
         console.error("File reading error:", error);
@@ -65,7 +74,7 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
       if (file.type === "text/plain") {
         reader.readAsText(file);
       } else {
-        // For PDF and Word files, simulate content extraction
+        // For other file types, simulate processing delay
         setTimeout(() => {
           try {
             resolve(generateSampleContent(file.name, file.type.includes("pdf") ? "pdf" : "docx"));
@@ -87,7 +96,7 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
     
     if (hasGoodStructure) {
 content += `Title: ${fileName.replace(/\.(pdf|docx|txt)$/i, "").replace(/-/g, " ")}\n`;
-content += `Document ID: SOP-${Math.floor(Math.random() * 999 + 1).toString().padStart(3, "0")}\n`;
+      content += `Document ID: SOP-${Math.floor(Math.random() * 999 + 1).toString().padStart(3, "0")}\n`;
       content += `Version: ${Math.floor(Math.random() * 3) + 1}.${Math.floor(Math.random() * 5)}\n`;
       content += `Effective Date: 2024-${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, "0")}-${(Math.floor(Math.random() * 28) + 1).toString().padStart(2, "0")}\n\n`;
     } else {
