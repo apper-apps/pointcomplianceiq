@@ -100,7 +100,10 @@ async validateDocument(document) {
 
     // Check for required sections
     const requiredSections = [
-      { name: "title", pattern: /title:/i, rule: "Required Title Section" },
+{ name: "title", pattern: /title:/i, rule: "Required Title Section" },
+      { name: "document id", pattern: /document id:/i, rule: "Document ID Format" },
+      { name: "version", pattern: /(version|revision):/i, rule: "Version Information" },
+      { name: "effective date", pattern: /effective date:/i, rule: "Effective Date" },
       { name: "purpose", pattern: /purpose:/i, rule: "Purpose Section" },
       { name: "scope", pattern: /scope:/i, rule: "Scope Section" },
       { name: "responsibilities", pattern: /responsibilities:/i, rule: "Responsibilities Section" },
@@ -126,59 +129,120 @@ async validateDocument(document) {
     });
 
     // Check document ID format
-    if (!/SOP-\d{3}/i.test(content)) {
+if (!/SOP-\d{3}/i.test(content)) {
       issues.push({
         id: "invalid-doc-id",
         category: "Metadata",
         severity: "Critical",
-        description: "Document ID must follow SOP-### format",
+        description: "Document ID must follow SOP-### format (e.g., SOP-001, SOP-002)",
         location: "Document header",
         rule: "Document ID Format"
       });
     }
 
+    // Check for version/revision information
+    if (!/version:\s*\d+\.\d+|revision:\s*\d+\.\d+/i.test(content)) {
+      issues.push({
+        id: "missing-version",
+        category: "Metadata",
+        severity: "Critical",
+        description: "Document must contain version/revision information (e.g., Version: 1.0, Revision: 2.1)",
+        location: "Document metadata",
+        rule: "Version Information"
+      });
+    }
+
     // Check for effective date format
-    if (!/\d{4}-\d{2}-\d{2}/.test(content)) {
+if (!/effective date:\s*\d{4}-\d{2}-\d{2}/i.test(content)) {
       issues.push({
         id: "missing-effective-date",
         category: "Metadata",
         severity: "Critical",
-        description: "Effective date must be in YYYY-MM-DD format",
+        description: "Effective date must be present and follow YYYY-MM-DD format",
         location: "Document metadata",
         rule: "Effective Date"
       });
     }
 
+    // Check for revision history table
+    const revisionHistoryMatch = content.match(/revision history:([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
+    if (!revisionHistoryMatch || revisionHistoryMatch[1].includes('[Empty]') || revisionHistoryMatch[1].includes('TBD')) {
+      issues.push({
+        id: "incomplete-revision-history",
+        category: "Metadata",
+        severity: "Critical",
+        description: "Revision History must include at least one complete entry with Version, Date, Description of Change, and Approved By",
+        location: "Revision History section",
+        rule: "Revision History"
+      });
+    }
+
     // Check for placeholder text
-    const placeholders = ["tbd", "lorem ipsum", "placeholder", "[empty]"];
+const placeholders = ["tbd", "lorem ipsum", "placeholder", "[empty]", "to be determined", "insert text here"];
     placeholders.forEach(placeholder => {
-      if (contentLower.includes(placeholder)) {
+      if (contentLower.includes(placeholder.toLowerCase())) {
         issues.push({
-          id: `placeholder-${placeholder}`,
+          id: `placeholder-${placeholder.replace(/\s+/g, '-')}`,
           category: "Content",
           severity: "Major",
-          description: `Contains placeholder text: "${placeholder}"`,
+          description: `Contains prohibited placeholder text: "${placeholder}". All content must be complete and meaningful.`,
           location: "Document content",
           rule: "No Placeholder Text"
         });
       }
     });
 
+    // Check for signature accountability
+    const signaturesPattern = /(prepared by|reviewed by|approved by):\s*([^\n\r]+)/gi;
+    const signatures = [...content.matchAll(signaturesPattern)];
+    const requiredSignatures = ['prepared by', 'reviewed by', 'approved by'];
+    
+    requiredSignatures.forEach(sigType => {
+      const found = signatures.find(sig => sig[1].toLowerCase() === sigType);
+      if (!found || found[2].includes('TBD') || found[2].includes('[') || found[2].trim().length < 3) {
+        issues.push({
+          id: `missing-${sigType.replace(/\s+/g, '-')}`,
+          category: "Content",
+          severity: "Critical",
+          description: `Missing or incomplete "${sigType}" signature. Must include name, title, and date for accountability.`,
+          location: "Approvals section",
+          rule: "Approval Signatures"
+        });
+      }
+    });
+
     // Check procedure steps
-    const procedureSteps = (content.match(/\d+\.\s+[A-Z]/g) || []).length;
+const procedureSteps = (content.match(/\d+\.\s+[A-Z]/g) || []).length;
     if (procedureSteps < 3) {
       issues.push({
         id: "insufficient-steps",
         category: "Content",
         severity: "Critical",
-        description: "Procedure section must contain at least 3 numbered steps",
+        description: "Procedure section must contain at least 3 clearly numbered steps with action-oriented language",
         location: "Procedure section",
         rule: "Procedure Section"
       });
     }
 
+    // Check for action-oriented language in procedures
+    const procedureMatch = content.match(/procedure:([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
+    if (procedureMatch) {
+      const procedureText = procedureMatch[1];
+      const actionWords = /(submit|review|approve|verify|document|record|check|validate|ensure|complete|perform)/i;
+      if (!actionWords.test(procedureText)) {
+        issues.push({
+          id: "weak-procedure-language",
+          category: "Content",
+          severity: "Minor",
+          description: "Procedures should use action-oriented language (Submit, Review, Approve, etc.)",
+          location: "Procedure section",
+          rule: "Procedure Section"
+        });
+      }
+    }
+
     // Check references with years
-    const references = content.match(/references:([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
+const references = content.match(/references:([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
     if (references) {
       const referenceText = references[1];
       const hasYears = /\d{4}/.test(referenceText);
@@ -187,14 +251,30 @@ async validateDocument(document) {
           id: "missing-reference-years",
           category: "Content",
           severity: "Major",
-          description: "References must include publication years",
+          description: "References must include publication years (e.g., ISO 13485:2016, ICH Q7 (2000))",
           location: "References section",
           rule: "References Section"
         });
       }
+
+      // Check for outdated references (before 2010)
+      const yearMatches = referenceText.match(/\d{4}/g);
+      if (yearMatches) {
+        const outdatedYears = yearMatches.filter(year => parseInt(year) < 2010);
+        if (outdatedYears.length > 0) {
+          issues.push({
+            id: "outdated-references",
+            category: "Content",
+            severity: "Minor",
+            description: `References contain potentially outdated years: ${outdatedYears.join(', ')}. Consider updating to current versions.`,
+            location: "References section",
+            rule: "References Section"
+          });
+        }
+      }
     }
 
-    return issues;
+return issues;
   }
 
   calculateComplianceScore(issues) {

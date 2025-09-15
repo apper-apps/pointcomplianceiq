@@ -17,11 +17,11 @@
   },
   {
     "Id": 3,
-    "name": "Version Information",
+"name": "Version Information",
     "category": "Metadata",
     "severity": "Critical",
     "enabled": true,
-    "validation": "Document must contain version/revision information"
+    "validation": "Document must contain version/revision information (e.g., Version: 1.0, Revision: 2.1)"
   },
   {
     "Id": 4,
@@ -81,19 +81,19 @@
   },
   {
     "Id": 11,
-    "name": "Revision History",
+"name": "Revision History",
     "category": "Metadata",
     "severity": "Critical",
     "enabled": true,
-    "validation": "Must contain at least one revision history entry"
+    "validation": "Must contain at least one complete revision history entry with Version, Date, Description of Change, and Approved By"
   },
   {
-    "Id": 12,
+"Id": 12,
     "name": "Approval Signatures",
     "category": "Content",
     "severity": "Critical",
     "enabled": true,
-    "validation": "Must contain Prepared by, Reviewed by, and Approved by signatures"
+    "validation": "Must contain Prepared by, Reviewed by, and Approved by signatures with names, titles, and dates for accountability"
   },
   {
     "Id": 13,
@@ -101,7 +101,7 @@
     "category": "Content",
     "severity": "Major",
     "enabled": true,
-    "validation": "Document must not contain TBD, lorem ipsum, or similar placeholders"
+"validation": "Document must not contain TBD, lorem ipsum, or similar placeholders"
   },
   {
     "Id": 14,

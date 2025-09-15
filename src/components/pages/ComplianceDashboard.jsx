@@ -204,11 +204,12 @@ onAction={() => {
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center mx-auto mb-6">
                   <ApperIcon name="Database" className="w-8 h-8 text-green-600" />
-                </div>
+</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">Metadata Validation</h3>
                 <p className="text-gray-600">
-                  Checks Document ID format (SOP-###), version information, effective dates, 
-                  and revision history completeness.
+                  Comprehensive validation including Document ID format (SOP-###), version/revision tracking, 
+                  YYYY-MM-DD effective dates, complete revision history tables, and signature accountability 
+                  for Prepared by, Reviewed by, and Approved by roles.
                 </p>
               </div>
 

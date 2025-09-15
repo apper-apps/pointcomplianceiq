@@ -14,9 +14,10 @@ const ValidationResults = ({ validationResult, document, className }) => {
   const handleExportReport = (format) => {
     const reportData = {
       document: {
-        name: document.fileName,
+name: document.fileName,
         uploadDate: document.uploadDate,
-        type: document.type
+        type: document.type,
+        size: document.size || 'Unknown'
       },
       validation: {
         score: validationResult.score,

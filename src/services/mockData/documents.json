@@ -11,8 +11,8 @@
   {
     "Id": 2,
     "fileName": "SOP-Manufacturing-Process.docx",
-    "uploadDate": "2024-01-14T14:15:00Z",
-    "content": "Manufacturing Process SOP\n\nDocument ID: SOP-MFG-002\nVersion: 1.5\nEffective Date: TBD\n\nTitle: Manufacturing Process Control\n\nPurpose:\nTo establish procedures for manufacturing control.\n\nScope:\nAll manufacturing areas.\n\nResponsibilities:\nTBD\n\nDefinitions:\nlorem ipsum dolor sit amet\n\nProcedure:\n1. Start equipment\n2. Monitor process\n\nReferences:\nICH Q7\nISO 13485\n\nRevision History:\n[Empty]\n\nApprovals:\nPrepared by: [TBD]",
+"uploadDate": "2024-01-14T14:15:00Z",
+    "content": "STANDARD OPERATING PROCEDURE\n\nTitle: Manufacturing Process Control\nDocument ID: SOP-MFG-002\nVersion: 1.5\nEffective Date: TBD\n\nPurpose:\nTo establish procedures for manufacturing control and process monitoring.\n\nScope:\nApplies to all manufacturing areas and production equipment.\n\nResponsibilities:\nProduction Manager: TBD\nQuality Assurance: To be determined\n\nDefinitions:\nlorem ipsum dolor sit amet consectetur adipiscing elit\nGMP: Good Manufacturing Practice\n\nProcedure:\n1. Start equipment\n2. Monitor process\n\nReferences:\nICH Q7\nISO 13485\n\nRevision History:\n[Empty]\n\nApprovals:\nPrepared by: [TBD]\nReviewed by: Insert reviewer name here\nApproved by: placeholder text",
     "type": "docx",
     "status": "completed",
     "complianceScore": 34
