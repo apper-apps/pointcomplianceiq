@@ -441,4 +441,3 @@ class DocumentService {
 // Export singleton instance
 const documentService = new DocumentService();
 export default documentService;
-export default new DocumentService();
