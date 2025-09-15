@@ -87,9 +87,8 @@ const DocumentUploadSection = ({ onDocumentProcessed, currentDocument, onDocumen
     
     if (hasGoodStructure) {
 content += `Title: ${fileName.replace(/\.(pdf|docx|txt)$/i, "").replace(/-/g, " ")}\n`;
-      content += `Document ID: SOP-${Math.floor(Math.random() * 999 + 1).toString().padStart(3, "0")}\n`;
+content += `Document ID: SOP-${Math.floor(Math.random() * 999 + 1).toString().padStart(3, "0")}\n`;
       content += `Version: ${Math.floor(Math.random() * 3) + 1}.${Math.floor(Math.random() * 5)}\n`;
-      content += `Effective Date: ${new Date().toISOString().split('T')[0]}\n`;
       content += `Effective Date: 2024-${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, "0")}-${(Math.floor(Math.random() * 28) + 1).toString().padStart(2, "0")}\n\n`;
     } else {
       content += `Title: ${fileName}\n`;

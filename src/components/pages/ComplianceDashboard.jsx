@@ -74,12 +74,28 @@ const ComplianceDashboard = () => {
               message="Upload your regulatory document to begin AI-powered compliance validation. Our system will check for GxP requirements, missing sections, and compliance gaps."
               actionText="Upload Your First Document"
 onAction={() => {
-                // Trigger file dialog through DocumentUploadSection
-                const fileInput = document.querySelector('input[type="file"]');
-                if (fileInput) {
-                  fileInput.click();
-                } else {
-                  // Scroll to upload section if file input not found
+                // Trigger file dialog through DocumentUploadSection with improved reliability
+                try {
+                  const fileInput = document.querySelector('input[type="file"][accept*=".pdf"]');
+                  if (fileInput && !fileInput.disabled) {
+                    fileInput.click();
+                  } else {
+                    // Fallback: scroll to upload section and try to find button
+                    const uploadSection = document.querySelector('[data-upload-section="true"]');
+                    if (uploadSection) {
+                      uploadSection.scrollIntoView({ behavior: 'smooth' });
+                      // Try to find and click the upload button after scroll
+                      setTimeout(() => {
+                        const uploadButton = uploadSection.querySelector('button');
+                        if (uploadButton && !uploadButton.disabled) {
+                          uploadButton.click();
+                        }
+                      }, 300);
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error triggering file upload:', error);
+                  // Final fallback: scroll to upload section
                   const uploadSection = document.querySelector('[data-upload-section="true"]');
                   if (uploadSection) {
                     uploadSection.scrollIntoView({ behavior: 'smooth' });
