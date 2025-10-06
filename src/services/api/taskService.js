@@ -20,8 +20,9 @@ class TaskService {
           { field: { Name: "description_c" } },
           { field: { Name: "status_c" } },
           { field: { Name: "priority_c" } },
-          { field: { Name: "CreatedOn" } },
-          { field: { Name: "ModifiedOn" } }
+{ field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } },
+          { field: { Name: "assign_to_c" } }
         ],
         orderBy: [
           {
@@ -80,8 +81,9 @@ class TaskService {
           { field: { Name: "description_c" } },
           { field: { Name: "status_c" } },
           { field: { Name: "priority_c" } },
-          { field: { Name: "CreatedOn" } },
-          { field: { Name: "ModifiedOn" } }
+{ field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } },
+          { field: { Name: "assign_to_c" } }
         ]
       };
 
@@ -112,7 +114,8 @@ class TaskService {
         description_c: taskData.description_c || '',
         status_c: taskData.status_c || 'Open',
         priority_c: taskData.priority_c || 'Medium',
-        Tags: taskData.Tags || ''
+Tags: taskData.Tags || '',
+        assign_to_c: taskData.assign_to_c ? parseInt(taskData.assign_to_c) : undefined
       };
 
       const params = {
@@ -173,7 +176,8 @@ class TaskService {
         description_c: taskData.description_c,
         status_c: taskData.status_c,
         priority_c: taskData.priority_c,
-        Tags: taskData.Tags || ''
+Tags: taskData.Tags || '',
+        assign_to_c: taskData.assign_to_c ? parseInt(taskData.assign_to_c) : undefined
       };
 
       const params = {
