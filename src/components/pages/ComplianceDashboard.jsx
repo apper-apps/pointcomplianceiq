@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { AuthContext } from "../../App";
@@ -7,8 +8,8 @@ import ValidationResults from "@/components/organisms/ValidationResults";
 import DocumentUploadSection from "@/components/organisms/DocumentUploadSection";
 import Button from "@/components/atoms/Button";
 import Empty from "@/components/ui/Empty";
-
 const ComplianceDashboard = ({ authMethods }) => {
+  const navigate = useNavigate();
   const [currentDocument, setCurrentDocument] = useState(null);
   const [validationResult, setValidationResult] = useState(null);
   const [showingResults, setShowingResults] = useState(false);
@@ -34,7 +35,7 @@ const ComplianceDashboard = ({ authMethods }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+<header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
@@ -47,7 +48,15 @@ const ComplianceDashboard = ({ authMethods }) => {
               </div>
             </div>
 
-<div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/tasks')}
+                className="flex items-center space-x-2 px-4 py-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors duration-200"
+              >
+                <ApperIcon name="ListTodo" className="w-4 h-4" />
+                <span className="text-sm font-medium">Tasks</span>
+              </button>
+
               {currentDocument && (
                 <button
                   onClick={handleNewUpload}
