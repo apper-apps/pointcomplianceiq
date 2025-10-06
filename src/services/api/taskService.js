@@ -115,7 +115,7 @@ class TaskService {
         status_c: taskData.status_c || 'Open',
         priority_c: taskData.priority_c || 'Medium',
 Tags: taskData.Tags || '',
-        assign_to_c: taskData.assign_to_c ? parseInt(taskData.assign_to_c) : undefined
+assign_to_c: taskData.assign_to_c || undefined
       };
 
       const params = {
@@ -177,7 +177,7 @@ Tags: taskData.Tags || '',
         status_c: taskData.status_c,
         priority_c: taskData.priority_c,
 Tags: taskData.Tags || '',
-        assign_to_c: taskData.assign_to_c ? parseInt(taskData.assign_to_c) : undefined
+assign_to_c: taskData.assign_to_c || undefined
       };
 
       const params = {

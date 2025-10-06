@@ -22,7 +22,7 @@ Tags: '',
         status_c: task.status_c || 'Open',
         priority_c: task.priority_c || 'Medium',
 Tags: task.Tags || '',
-        assign_to_c: task.assign_to_c?.Id || ''
+assign_to_c: task.assign_to_c || ''
       });
     }
   }, [task]);
@@ -145,21 +145,19 @@ Tags: task.Tags || '',
 </div>
 
             {/* Assign To */}
-            <div>
+<div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Assign To
               </label>
-              <select
+              <Input
                 name="assign_to_c"
                 value={formData.assign_to_c}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
-              >
-                <option value="">Unassigned</option>
-                {/* User options will be populated when user service is available */}
-              </select>
+                placeholder="Enter assignee name"
+                className="w-full"
+              />
               <p className="text-xs text-gray-500 mt-1">
-                Select a user to assign this task to
+                Enter the name of the person to assign this task to
               </p>
             </div>
             {/* Tags */}

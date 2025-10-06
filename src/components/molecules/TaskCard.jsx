@@ -93,10 +93,10 @@ const TaskCard = ({ task, onEdit, onDelete }) => {
         )}
 
 {/* Assigned To */}
-        {task.assign_to_c && (
+{task.assign_to_c && (
           <div className="flex items-center text-xs text-gray-600 pb-3">
             <ApperIcon name="User" className="w-3 h-3 mr-1" />
-            <span>Assigned to: {task.assign_to_c?.Name || 'Unassigned'}</span>
+            <span>Assigned to: {task.assign_to_c || 'Unassigned'}</span>
           </div>
         )}
 
